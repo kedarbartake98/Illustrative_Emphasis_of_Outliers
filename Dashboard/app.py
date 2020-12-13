@@ -59,6 +59,7 @@ df['LOF Score'] = loc.negative_outlier_factor_*(-1)
 df['Outlier'] = loc.fit_predict(df)
 
 df['color'] = df['LOF Score'].map(lambda x: 'orange' if x>=1.5 else 'blue')
+df['Flag'] = df['LOF Score'].map(lambda x: 'Outlier' if x>=1.5 else 'Data Point')
 
 
 kde = KernelDensity()
@@ -81,6 +82,8 @@ threshold = np.percentile(df['kde'], 90)
 
 peaks = df[df['kde'] >= threshold]
 df['color'] = df.apply(lambda x: 'yellow' if x['kde'] >= threshold else x['color'], axis = 1)
+df['Flag'] = df.apply(lambda x: 'Density Peak' if x['kde'] >= threshold else x['Flag'], axis = 1)
+
 peaks = peaks[cols].to_numpy()
 
 #df.plot.scatter(x=cols[0], y=cols[1], c=df['color'],figsize=(10,10),
@@ -135,7 +138,7 @@ def sendwith(sub_factor):
 	final = []
 
 	for i in range(0,len(df)):
-          final.append({'A':df['X_new'].iloc[i],'B':df['Y_new'].iloc[i],'C':df['color'].iloc[i]})
+		final.append({'A':df['X_new'].iloc[i],'B':df['Y_new'].iloc[i],'C':df['color'].iloc[i],'D':df['Flag'].iloc[i]})
 
 	rect={
 		'datapoints':final
@@ -191,7 +194,7 @@ def sendwithout(sub_factor):
 	final = []
 
 	for i in range(0,len(df)):
-          final.append({'A':df['X_new'].iloc[i],'B':df['Y_new'].iloc[i],'C':df['color'].iloc[i]})
+		final.append({'A':df['X_new'].iloc[i],'B':df['Y_new'].iloc[i],'C':df['color'].iloc[i],'D':df['Flag'].iloc[i]})
 
 	rect={
 		'datapoints':final
