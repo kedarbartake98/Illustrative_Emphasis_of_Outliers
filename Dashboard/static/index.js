@@ -61,7 +61,7 @@ function draw_scattplot_with(dataset)
     xScale.domain([d3.min(data, xValue)-1.5, d3.max(data, xValue)+1.5]);
     yScale.domain([d3.min(data, yValue)-1.5, d3.max(data, yValue)+1.5]);
     
-    var cValue = function(d) { return d.C;},
+    var cValue = function(d) { return d.D;},
     color = d3.scale.category10();
 // add the graph canvas to the body of the webpage
     var svg = d3.select("body").append("svg").attr('class','svgid')
@@ -106,6 +106,27 @@ function draw_scattplot_with(dataset)
       .style("fill", function(d) { return color(cValue(d));});
 
   // draw legend
+  var legend = svg.selectAll(".legend")
+      .data(color.domain())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  // draw legend colored rectangles
+  legend.append("rect")
+      .attr("x", width - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+
+  // draw legend text
+  legend.append("text")
+      .attr("x", width - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d;})
+
 
   changeDist_with()
 }
@@ -155,7 +176,7 @@ function draw_scattplot_without(dataset)
     xScale.domain([d3.min(data, xValue)-1.5, d3.max(data, xValue)+1.5]);
     yScale.domain([d3.min(data, yValue)-1.5, d3.max(data, yValue)+1.5]);
     
-    var cValue = function(d) { return d.C;},
+    var cValue = function(d) { return d.D;},
     color = d3.scale.category10();
 // add the graph canvas to the body of the webpage
     var svg = d3.select("body").append("svg").attr('class','svgid')
@@ -200,6 +221,26 @@ function draw_scattplot_without(dataset)
       .style("fill", function(d) { return color(cValue(d));});
 
   // draw legend
+  var legend = svg.selectAll(".legend")
+      .data(color.domain())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  // draw legend colored rectangles
+  legend.append("rect")
+      .attr("x", width - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+
+  // draw legend text
+  legend.append("text")
+      .attr("x", width - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d;})
 
   changeDist_without()
 }
