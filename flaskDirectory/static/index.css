@@ -1,0 +1,56 @@
+
+.menu {
+  background-color: #160942;
+  overflow: hidden;
+}
+
+.menu a {
+  float: center;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 12px 14px;
+  font-size: 22x;
+}
+
+.menu a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+h1,h2{
+  background-color:  #ddd;
+}
+
+.bar1{
+  fill:#5e64c1;
+}
+.bar2: hover {
+  fill: #8c520a;
+}
+
+  
+.slider{
+  width: 50%;
+.slider input{
+transform: rotate(-90deg);
+}
+.sli{
+  width: 100%; 
+  height: 25px; 
+  background: #ddd; 
+  outline: none; 
+  opacity: 1; 
+}
+
+
+.sli::-webkit-slider-thumb {
+  width: 25px; 
+  height: 25px; 
+  background: #5e64c1; 
+}
+
+.sli::-moz-range-thumb {
+  width: 25px; 
+  height: 25px; 
+  background: #5e64c1; 
+}
