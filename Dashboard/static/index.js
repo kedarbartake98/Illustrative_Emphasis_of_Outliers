@@ -3,9 +3,9 @@ function send()
 {
   var rb = document.getElementById("samplingType");
   if(rb[0].checked)
-        send_data_with("/sendwith/"+0.5)
+        send_data_with("/sendwith/"+1.75)
   else
-        send_data_without("/sendwithout/"+0.5)  
+        send_data_without("/sendwithout/"+1.75)  
 }
 function send_data_with(url) {
   console.log(url)
@@ -58,8 +58,8 @@ function draw_scattplot_with(dataset)
     yAxis = d3.svg.axis().scale(yScale).orient("left");
 
 // setup fill color
-    xScale.domain([d3.min(data, xValue)-1.5, d3.max(data, xValue)+1.5]);
-    yScale.domain([d3.min(data, yValue)-1.5, d3.max(data, yValue)+1.5]);
+    xScale.domain([-10,30]);
+    yScale.domain([-15,60]);
     
     var cValue = function(d) { return d.D;},
     color = d3.scale.category10();
@@ -143,7 +143,7 @@ function changeDist_with()
     //bin.innerHTML = (parseInt(this.value)); 
     var dist=parseFloat(slider.value);
     console.log(typeof dist)
-    send_data_with("/sendwith/"+dist);
+    send_data_with("/sendwith/"+(1.75-dist));
 } 
 })
 }
@@ -173,9 +173,11 @@ function draw_scattplot_without(dataset)
     yAxis = d3.svg.axis().scale(yScale).orient("left");
 
 // setup fill color
-    xScale.domain([d3.min(data, xValue)-1.5, d3.max(data, xValue)+1.5]);
-    yScale.domain([d3.min(data, yValue)-1.5, d3.max(data, yValue)+1.5]);
-    
+    //xScale.domain([d3.min(data, xValue)-1.5, d3.max(data, xValue)+1.5]);
+    //yScale.domain([d3.min(data, yValue)-1.5, d3.max(data, yValue)+1.5]);
+    xScale.domain([-10,30]);
+    yScale.domain([-15,60]);
+
     var cValue = function(d) { return d.D;},
     color = d3.scale.category10();
 // add the graph canvas to the body of the webpage
@@ -257,7 +259,7 @@ function changeDist_without()
     //bin.innerHTML = (parseInt(this.value)); 
     var dist=parseFloat(slider.value);
     console.log(typeof dist)
-    send_data_without("/sendwithout/"+dist);
+    send_data_without("/sendwithout/"+(1.75-dist));
 } 
 })
 }
