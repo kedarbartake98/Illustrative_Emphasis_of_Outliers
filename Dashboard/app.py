@@ -38,7 +38,7 @@ class NpEncoder(json.JSONEncoder):
 
 housing_full=pd.read_csv('Housing_data.csv')
 N_NEIGHBORS = 5
-sub_factor = 0.5
+sub_factor = 0.0
 @app.route("/")
 def index():
     return render_template("index.html")
