@@ -123,6 +123,7 @@ def parallel_implementation(df, sub_factor, move_inliers=False):
     '''
     Parallelize implementation of function across entire daraframe
     '''
+
     # Calculate number of rows per CPU core 
     num_cores = os.cpu_count()
     rows_per_core = ceil(len(df)/num_cores)
@@ -139,9 +140,6 @@ def parallel_implementation(df, sub_factor, move_inliers=False):
     # Concatenate the dataframes received from all processes
     result = pd.concat(result_list)
 
-    # print('Result')
-    # print(result.head())
-
     # Convert into output format for sending to frontend
     final = []
 
@@ -150,15 +148,6 @@ def parallel_implementation(df, sub_factor, move_inliers=False):
                       'B':result['Y_new'].iloc[i],\
                       'C':result['color'].iloc[i],\
                       'D':result['Flag'].iloc[i]})
-
-    # print('#'*100)
-    # print(len(final))
-    # print('#'*100)
-    # print(final)
-
-    # print('#'*100)
-    # print('Changing coordinates {} ...'.format(0))
-    # print('#'*100)
 
     rect = {'datapoints': final}
 
@@ -215,7 +204,6 @@ def move_outliers(df, sub_factor, peaks, peaks_nn, move_inliers=False):
                 scale = ((df['LOF Score'].iloc[i]-\
                         sub_factor)*distance[0][0])/df['kde'].iloc[i]
             else:
-                # Changed
                 scale = 0
         else:
             outlier_score = df['LOF Score'].iloc[i]
