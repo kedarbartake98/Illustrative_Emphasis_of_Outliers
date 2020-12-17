@@ -210,6 +210,32 @@ def parallel_implementation(df, move_inliers=False):
     Parallelize implementation of function across entire daraframe
     '''
 
+    # Calculate number of rows per CPU core 
+    num_cores = os.cpu_count()
+    rows_per_core = ceil(len(df)/num_cores)
+
+    # Distribute the df across all the cpu cores
+    slices_list = [df.iloc[rows_per_core*core + rows_per_core*(core+1)] 
+                   for core in range(num_cores)]
+
+    # Execute the processing function on each slice parallely
+    result_list = Parallel(n_jobs=num_cores, verbose=100)(delayed(move_outliers)
+                           (df_slice, sub_factor, peaks, peaks_nn, move_inliers) 
+                           for df_slice in slices_list)
+
+    # Concatenate the dataframes received from all processes
+    result = pd.concat(result_list)
+
+    # Convert into output format for sending to frontend
+    final = {'A': result['X_new'], \
+             'B': result['Y_new'], \
+             'C': result['color'], \
+             'D': result['Flag']}
+
+    rect = { 'datapoints': final}
+
+    return rect
+
 
 def move_outliers(df, sub_factor, peaks, peaks_nn, move_inliers=False):
     '''
@@ -265,17 +291,18 @@ def move_outliers(df, sub_factor, peaks, peaks_nn, move_inliers=False):
         df['X_new'].iloc[i] = (df[cols[0]].iloc[i]+dx).astype(float)
         df['Y_new'].iloc[i] = (df[cols[1]].iloc[i]+dy).astype(float)
 
+    return df
         
-    final = []
+    # final = []
 
-    for i in range(0,len(df)):
-        final.append({'A':df['X_new'].iloc[i],'B':df['Y_new'].iloc[i],'C':df['color'].iloc[i],'D':df['Flag'].iloc[i]})
+    # for i in range(0,len(df)):
+    #     final.append({'A':df['X_new'].iloc[i],'B':df['Y_new'].iloc[i],'C':df['color'].iloc[i],'D':df['Flag'].iloc[i]})
 
-    rect={
-        'datapoints':final
-    }
-    # print(final)
-    return rect
+
+    # rect={
+    #     'datapoints':final
+    # }
+    # return rect
 
 
 
