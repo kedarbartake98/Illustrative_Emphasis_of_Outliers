@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import seaborn as sns
+import warnings
 
 import sklearn as skt
 from sklearn import preprocessing 
@@ -26,7 +27,9 @@ from sklearn.neighbors import LocalOutlierFactor, KernelDensity, NearestNeighbor
 ################################# GLOBAL CODE ##################################
 
 # create the Flask instance
-app = Flask(__name__) 
+app = Flask(__name__)
+
+warnings.filterwarnings("ignore") 
 
 housing_full=pd.read_csv('Housing_data.csv')
 N_NEIGHBORS = 5
@@ -102,7 +105,7 @@ def index():
 def sendwith(sub_factor):
     
     # Mode where we move inliners in and outliers out
-    rect = parallel_implementation(df, move_inliers=True)
+    rect = parallel_implementation(df, sub_factor, move_inliers=True)
     
     return json.dumps(rect,cls=NpEncoder)
 
@@ -112,15 +115,14 @@ def sendwithout(sub_factor):
 
     print('Called without functions')
     # Mode where we move outliers out and not inliers
-    rect = parallel_implementation(df, move_inliers=False)
+    rect = parallel_implementation(df, sub_factor, move_inliers=False)
 
     return json.dumps(rect,cls=NpEncoder)
 
-def parallel_implementation(df, move_inliers=False):
+def parallel_implementation(df, sub_factor, move_inliers=False):
     '''
     Parallelize implementation of function across entire daraframe
     '''
-
     # Calculate number of rows per CPU core 
     num_cores = os.cpu_count()
     rows_per_core = ceil(len(df)/num_cores)
