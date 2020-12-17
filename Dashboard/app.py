@@ -126,7 +126,7 @@ def parallel_implementation(df, move_inliers=False):
     rows_per_core = ceil(len(df)/num_cores)
 
     # Distribute the df across all the cpu cores
-    slices_list = [df.iloc[rows_per_core*core + rows_per_core*(core+1)] 
+    slices_list = [df.iloc[rows_per_core*core:rows_per_core*(core+1)] 
                    for core in range(num_cores)]
 
     # Execute the processing function on each slice parallely
@@ -137,11 +137,22 @@ def parallel_implementation(df, move_inliers=False):
     # Concatenate the dataframes received from all processes
     result = pd.concat(result_list)
 
+    print('Result')
+    print(result.head())
+
     # Convert into output format for sending to frontend
-    final = {'A': result['X_new'], \
-             'B': result['Y_new'], \
-             'C': result['color'], \
-             'D': result['Flag']}
+    final = []
+
+    for i in range(0,len(result)):
+        final.append({'A':result['X_new'].iloc[i],\
+                      'B':result['Y_new'].iloc[i],\
+                      'C':result['color'].iloc[i],\
+                      'D':result['Flag'].iloc[i]})
+
+    print('#'*100)
+    print(len(final))
+    print('#'*100)
+    print(final)
 
     rect = {'datapoints': final}
 
