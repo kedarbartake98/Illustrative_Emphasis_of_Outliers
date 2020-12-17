@@ -23,7 +23,6 @@ import sys, os
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.neighbors import LocalOutlierFactor, KernelDensity, NearestNeighbors
 
-
 ################################# GLOBAL CODE ##################################
 
 # create the Flask instance
@@ -111,6 +110,7 @@ def sendwith(sub_factor):
 @app.route("/sendwithout/<sub_factor>")
 def sendwithout(sub_factor):
 
+    print('Called without functions')
     # Mode where we move outliers out and not inliers
     rect = parallel_implementation(df, move_inliers=False)
 
@@ -130,15 +130,15 @@ def parallel_implementation(df, move_inliers=False):
                    for core in range(num_cores)]
 
     # Execute the processing function on each slice parallely
-    result_list = Parallel(n_jobs=num_cores, verbose=100)(delayed(move_outliers)
+    result_list = Parallel(n_jobs=num_cores, verbose=0)(delayed(move_outliers)
                            (df_slice, sub_factor, peaks, peaks_nn, move_inliers) 
                            for df_slice in slices_list)
 
     # Concatenate the dataframes received from all processes
     result = pd.concat(result_list)
 
-    print('Result')
-    print(result.head())
+    # print('Result')
+    # print(result.head())
 
     # Convert into output format for sending to frontend
     final = []
@@ -149,10 +149,14 @@ def parallel_implementation(df, move_inliers=False):
                       'C':result['color'].iloc[i],\
                       'D':result['Flag'].iloc[i]})
 
-    print('#'*100)
-    print(len(final))
-    print('#'*100)
-    print(final)
+    # print('#'*100)
+    # print(len(final))
+    # print('#'*100)
+    # print(final)
+
+    # print('#'*100)
+    # print('Changing coordinates {} ...'.format(0))
+    # print('#'*100)
 
     rect = {'datapoints': final}
 
