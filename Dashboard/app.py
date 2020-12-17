@@ -2,14 +2,14 @@ import json
 from flask import Flask, render_template, request, redirect, Response, jsonify
 import pandas as pd
 from flask import Flask
-app = Flask(__name__) # creates the Flask instance
+from joblib import Parallel, delayed
+from math import floor, ceil 
 
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import seaborn as sns
-
 
 import sklearn as skt
 from sklearn import preprocessing 
@@ -19,10 +19,11 @@ import scipy.stats as sci
 import random
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
-import sys
+import sys, os
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.neighbors import LocalOutlierFactor, KernelDensity, NearestNeighbors
 
+app = Flask(__name__) # creates the Flask instance
 
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -39,6 +40,7 @@ class NpEncoder(json.JSONEncoder):
 housing_full=pd.read_csv('Housing_data.csv')
 N_NEIGHBORS = 5
 sub_factor = 0.0
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -96,113 +98,187 @@ peaks_nn.fit(peaks)
 
 @app.route("/sendwith/<sub_factor>")
 def sendwith(sub_factor):
-	for i in tqdm(range(len(df))):
+    for i in tqdm(range(len(df))):
     
     # Assigning the nearest neighbor density peak to each point and calculating the distance 
-  		#print("HELLO")
+        #print("HELLO")
 
-		distance, index = peaks_nn.kneighbors(df[cols].iloc[i].to_numpy().reshape(1,-1))
-	#     print('Distance : {}\n index: {}\n'.format(distance, index))
-	    
-		distances = distance[0]
-		indexes = index[0]
-	    
-		dx,dy=0,0
-	    
-	    # Getting the X and Y directions towards the density peaks and adding them
-		x = df[cols[0]].iloc[i]
-		y = df[cols[1]].iloc[i]
-	    
-		for peak_ind in indexes:
-			curr_peak = peaks[peak_ind,:]
-	        
-			dx += curr_peak[0] - x
-			dy += curr_peak[1] - y
-	    
-	    # Scaling the magnitude of the vector (can experiment with more mathematical formulations)
-	    
-	    # Here, the idea is :
-	    # - The higher the density, the more the point gets pulled towards the density peak
-	    # - The higher the outlier score, the more the point gets pushed out (hence, -ve sign)
-	    # - Similarly, farther away the point from the density peak, the more it gets pushed out
-		#print(type(sub_factor))
-		sub_factor = float(sub_factor)
-		scale = ((df['LOF Score'].iloc[i] - sub_factor) * distance[0][0])/df['kde'].iloc[i]
-		dx *= scale
-		dy *= scale
-	    
-		df['X_new'].iloc[i] = (df[cols[0]].iloc[i]+dx).astype(float)
-		df['Y_new'].iloc[i] = (df[cols[1]].iloc[i]+dy).astype(float)
+        distance, index = peaks_nn.kneighbors(df[cols].iloc[i].to_numpy().reshape(1,-1))
+    #     print('Distance : {}\n index: {}\n'.format(distance, index))
+        
+        distances = distance[0]
+        indexes = index[0]
+        
+        dx,dy=0,0
+        
+        # Getting the X and Y directions towards the density peaks and adding them
+        x = df[cols[0]].iloc[i]
+        y = df[cols[1]].iloc[i]
+        
+        for peak_ind in indexes:
+            curr_peak = peaks[peak_ind,:]
+            
+            dx += curr_peak[0] - x
+            dy += curr_peak[1] - y
+        
+        # Scaling the magnitude of the vector (can experiment with more mathematical formulations)
+        
+        # Here, the idea is :
+        # - The higher the density, the more the point gets pulled towards the density peak
+        # - The higher the outlier score, the more the point gets pushed out (hence, -ve sign)
+        # - Similarly, farther away the point from the density peak, the more it gets pushed out
+        #print(type(sub_factor))
+        sub_factor = float(sub_factor)
+        scale = ((df['LOF Score'].iloc[i] - sub_factor) * distance[0][0])/df['kde'].iloc[i]
+        dx *= scale
+        dy *= scale
+        
+        df['X_new'].iloc[i] = (df[cols[0]].iloc[i]+dx).astype(float)
+        df['Y_new'].iloc[i] = (df[cols[1]].iloc[i]+dy).astype(float)
 
-	
-	final = []
+    
+    final = []
 
-	for i in range(0,len(df)):
-		final.append({'A':df['X_new'].iloc[i],'B':df['Y_new'].iloc[i],'C':df['color'].iloc[i],'D':df['Flag'].iloc[i]})
+    for i in range(0,len(df)):
+        final.append({'A':df['X_new'].iloc[i],'B':df['Y_new'].iloc[i],'C':df['color'].iloc[i],'D':df['Flag'].iloc[i]})
 
-	rect={
-		'datapoints':final
-	}
-	print(final)
-	return json.dumps(rect,cls=NpEncoder)
+    rect={
+        'datapoints':final
+    }
+    print(final)
+    return json.dumps(rect,cls=NpEncoder)
 
 
 @app.route("/sendwithout/<sub_factor>")
 def sendwithout(sub_factor):
-	for i in tqdm(range(len(df))):
+    for i in tqdm(range(len(df))):
     
     # Assigning the nearest neighbor density peak to each point and calculating the distance 
-  		#print("HELLO")
+        #print("HELLO")
 
-		distance, index = peaks_nn.kneighbors(df[cols].iloc[i].to_numpy().reshape(1,-1))
-	#     print('Distance : {}\n index: {}\n'.format(distance, index))
-	    
-		distances = distance[0]
-		indexes = index[0]
-	    
-		dx,dy=0,0
-	    
-	    # Getting the X and Y directions towards the density peaks and adding them
-		x = df[cols[0]].iloc[i]
-		y = df[cols[1]].iloc[i]
-	    
-		for peak_ind in indexes:
-			curr_peak = peaks[peak_ind,:]
-	        
-			dx += curr_peak[0] - x
-			dy += curr_peak[1] - y
-	    
-	    # Scaling the magnitude of the vector (can experiment with more mathematical formulations)
-	    
-	    # Here, the idea is :
-	    # - The higher the density, the more the point gets pulled towards the density peak
-	    # - The higher the outlier score, the more the point gets pushed out (hence, -ve sign)
-	    # - Similarly, farther away the point from the density peak, the more it gets pushed out
-		#print(type(sub_factor))
-		sub_factor = float(sub_factor)
-		if (df['LOF Score'].iloc[i]-1)>0:
-			scale = ((df['LOF Score'].iloc[i]-sub_factor)*distance[0][0])/df['kde'].iloc[i]
-		else:
-			scale = 1
-		dx *= scale
-		dy *= scale
-	    
-		df['X_new'].iloc[i] = (df[cols[0]].iloc[i]+dx).astype(float)
-		df['Y_new'].iloc[i] = (df[cols[1]].iloc[i]+dy).astype(float)
+        distance, index = peaks_nn.kneighbors(df[cols].iloc[i].to_numpy().reshape(1,-1))
+    #     print('Distance : {}\n index: {}\n'.format(distance, index))
+        
+        distances = distance[0]
+        indexes = index[0]
+        
+        dx,dy=0,0
+        
+        # Getting the X and Y directions towards the density peaks and adding them
+        x = df[cols[0]].iloc[i]
+        y = df[cols[1]].iloc[i]
+        
+        for peak_ind in indexes:
+            curr_peak = peaks[peak_ind,:]
+            
+            dx += curr_peak[0] - x
+            dy += curr_peak[1] - y
+        
+        # Scaling the magnitude of the vector (can experiment with more mathematical formulations)
+        
+        # Here, the idea is :
+        # - The higher the density, the more the point gets pulled towards the density peak
+        # - The higher the outlier score, the more the point gets pushed out (hence, -ve sign)
+        # - Similarly, farther away the point from the density peak, the more it gets pushed out
+        #print(type(sub_factor))
+        sub_factor = float(sub_factor)
+        if (df['LOF Score'].iloc[i]-1)>0:
+            scale = ((df['LOF Score'].iloc[i]-sub_factor)*distance[0][0])/df['kde'].iloc[i]
+        else:
+            # Changed
+            scale = 0
+        dx *= scale
+        dy *= scale
+        
+        df['X_new'].iloc[i] = (df[cols[0]].iloc[i]+dx).astype(float)
+        df['Y_new'].iloc[i] = (df[cols[1]].iloc[i]+dy).astype(float)
 
-	
-	final = []
+    
+    final = []
 
-	for i in range(0,len(df)):
-		final.append({'A':df['X_new'].iloc[i],'B':df['Y_new'].iloc[i],'C':df['color'].iloc[i],'D':df['Flag'].iloc[i]})
+    for i in range(0,len(df)):
+        final.append({'A':df['X_new'].iloc[i],'B':df['Y_new'].iloc[i],'C':df['color'].iloc[i],'D':df['Flag'].iloc[i]})
 
-	rect={
-		'datapoints':final
-	}
-	print(final)
-	return json.dumps(rect,cls=NpEncoder)
+    rect={
+        'datapoints':final
+    }
+    print(final)
+    return json.dumps(rect,cls=NpEncoder)
+
+def parallel_implementation(df, move_inliers=False):
+    '''
+    Parallelize implementation of function across entire daraframe
+    '''
+
+
+def move_outliers(df, sub_factor, peaks, peaks_nn, move_inliers=False):
+    '''
+    Calculate new coordinates for points after moving them using our 
+    displacement vectors. 
+    '''
+    sub_factor = float(sub_factor)
+
+    for i in range(len(df)):
+        
+        # Assigning the nearest neighbor density peak to each point and calculating the distance 
+            #print("HELLO")
+
+        distance, index = peaks_nn.kneighbors(df[cols].iloc[i].to_numpy().reshape(1,-1))
+        
+        distances = distance[0]
+        indexes = index[0]
+        
+        dx,dy=0,0
+        
+        # Getting the X and Y directions towards the density peaks and adding them
+        x = df[cols[0]].iloc[i]
+        y = df[cols[1]].iloc[i]
+        
+        for peak_ind in indexes:
+            curr_peak = peaks[peak_ind,:]
+            
+            dx += curr_peak[0] - x
+            dy += curr_peak[1] - y
+        
+        # Scaling the magnitude of the vector (can experiment with more mathematical formulations)
+        
+        # Here, the idea is :
+        # - The higher the density, the more the point gets pulled towards the density peak
+        # - The higher the outlier score, the more the point gets pushed out (hence, -ve sign)
+        # - Similarly, farther away the point from the density peak, the more it gets pushed out
+
+        if not move_inliers:
+
+            if (df['LOF Score'].iloc[i]-1)>0:
+                scale = ((df['LOF Score'].iloc[i]-\
+                        sub_factor)*distance[0][0])/df['kde'].iloc[i]
+            else:
+                # Changed
+                scale = 0
+        else:
+
+            scale = ((df['LOF Score'].iloc[i]-sub_factor)*distance[0][0])/df['kde'].iloc[i]
+
+        dx *= scale
+        dy *= scale
+        
+        df['X_new'].iloc[i] = (df[cols[0]].iloc[i]+dx).astype(float)
+        df['Y_new'].iloc[i] = (df[cols[1]].iloc[i]+dy).astype(float)
+
+        
+    final = []
+
+    for i in range(0,len(df)):
+        final.append({'A':df['X_new'].iloc[i],'B':df['Y_new'].iloc[i],'C':df['color'].iloc[i],'D':df['Flag'].iloc[i]})
+
+    rect={
+        'datapoints':final
+    }
+    # print(final)
+    return rect
+
 
 
 if __name__ == "__main__":
-	app.run(debug=True)
+    app.run(debug=True)
 
