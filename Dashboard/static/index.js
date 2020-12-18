@@ -1,12 +1,130 @@
 
-function send()
-{
-  var rb = document.getElementById("samplingType");
-  if(rb[0].checked)
-        send_data_with("/sendwith/"+1.75)
-  else
-        send_data_without("/sendwithout/"+1.75)  
+function setVal(){
+
+    document.getElementById("der").value = "0";
+    document.getElementById("Task2").value = "-1"
+
 }
+function selectType() {
+
+    var dropdown = document.getElementById("Task2");
+    var Value = dropdown.options[dropdown.selectedIndex].value;
+    var rb = document.getElementById("samplingType");
+    if(Value=="housing")
+    {
+      if(rb[0].checked)
+        send_data_with("/sendwith?dataset_name=Housing&sub_factor=1.75")
+  else
+        send_data_without("/sendwithout?dataset_name=Housing&sub_factor=1.75")  
+    }
+          
+    else if (Value=="air") 
+        {
+      if(rb[0].checked)
+        send_data_with("/sendwith?dataset_name=Air&sub_factor=1.75")
+  else
+        send_data_without("/sendwithout?dataset_name=Air&sub_factor=1.75")  
+    }
+    else if(Value=="estate")
+        {
+      if(rb[0].checked)
+        send_data_with("/sendwith?dataset_name=Estate&sub_factor=1.75")
+  else
+        send_data_without("/sendwithout?dataset_name=Estate&sub_factor=1.75")  
+    }
+    else if(Value=="cereal")
+        {
+      if(rb[0].checked)
+        send_data_with("/sendwith?dataset_name=Cereal&sub_factor=1.75")
+  else
+        send_data_without("/sendwithout?dataset_name=Cereal&sub_factor=1.75")  
+    }
+    else if(Value=="fire")
+      {
+      if(rb[0].checked)
+        send_data_with("/sendwith?dataset_name=Fire&sub_factor=1.75")
+  else
+        send_data_without("/sendwithout?dataset_name=Fire&sub_factor=1.75")  
+    }
+    else
+    {
+
+    }
+
+}
+
+function getDistType_with(Value,val) {
+
+    if(Value=="housing")
+    {
+        send_data_with("/sendwith?dataset_name=Housing&sub_factor="+val) 
+    }
+          
+    else if (Value=="air") 
+       {
+        send_data_with("/sendwith?dataset_name=Air&sub_factor="+val)
+    }
+    else if(Value=="estate")
+        {
+      
+        send_data_with("/sendwith?dataset_name=Estate&sub_factor="+val)
+  
+    }
+    else if(Value=="cereal")
+        {
+      
+        send_data_with("/sendwith?dataset_name=Cereal&sub_factor="+val)
+   
+    }
+    else if(Value=="fire")
+      {
+      
+        send_data_with("/sendwith?dataset_name=Fire&sub_factor="+val)
+   
+    }
+    else
+    {
+
+    }
+}
+
+function getDistType_without(Value,val) {
+
+    if(Value=="housing")
+    {
+        send_data_without("/sendwithout?dataset_name=Housing&sub_factor="+val) 
+    }
+          
+    else if (Value=="air") 
+       {
+        send_data_without("/sendwithout?dataset_name=Air&sub_factor="+val)
+    }
+    else if(Value=="estate")
+        {
+      
+        send_data_without("/sendwithout?dataset_name=Estate&sub_factor="+val)
+  
+    }
+    else if(Value=="cereal")
+        {
+      
+        send_data_without("/sendwithout?dataset_name=Cereal&sub_factor="+val)
+   
+    }
+    else if(Value=="fire")
+      {
+      
+        send_data_without("/sendwithout?dataset_name=Fire&sub_factor="+val)
+   
+    }
+    else
+    {
+
+    }
+}
+
+
+
 function send_data_with(url) {
   console.log(url)
 $.ajax({
@@ -18,6 +136,7 @@ $.ajax({
     }
   })
 }
+
 function send_data_without(url) {
   console.log(url)
 $.ajax({
@@ -30,11 +149,6 @@ $.ajax({
   })
 }
 
-function resetEverything() {
-     d3.selectAll('.svgid').remove();
-}
-
-
 function draw_scattplot_with(dataset)
 {
     d3.selectAll(".svgid").remove();
@@ -42,8 +156,8 @@ function draw_scattplot_with(dataset)
     data = dataset["datapoints"]
     console.log(data)
 
-    var margin = {top: 50, right: 10, bottom: 90, left: 300};
-    width = 1100 - margin.left - margin.right;
+    var margin = {top: 50, right: 10, bottom: 90, left: 100};
+    width = 1300 - margin.left - margin.right;
     height = 700 - margin.top - margin.bottom;
 
     var xValue = function(d) {return d.A;}, // data -> value
@@ -58,24 +172,24 @@ function draw_scattplot_with(dataset)
     yAxis = d3.svg.axis().scale(yScale).orient("left");
 
 // setup fill color
-    xScale.domain([-10,30]);
-    yScale.domain([-15,60]);
+    xScale.domain([-30,30]);
+    yScale.domain([-30,50]);
     
     var cValue = function(d) { return d.D;},
     color = d3.scale.category10();
 // add the graph canvas to the body of the webpage
     var svg = d3.select("body").append("svg").attr('class','svgid')
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   // x-axis
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
-    .append("text")
+      .append("text")
       .attr("class", "label")
       .attr("x", width)
       .attr("y", -6)
@@ -86,7 +200,7 @@ function draw_scattplot_with(dataset)
   svg.append("g")
       .attr("class", "y axis")
       .call(yAxis)
-    .append("text")
+      .append("text")
       .attr("class", "label")
       .attr("transform", "rotate(-90)")
       .attr("y", 6)
@@ -108,7 +222,7 @@ function draw_scattplot_with(dataset)
   // draw legend
   var legend = svg.selectAll(".legend")
       .data(color.domain())
-    .enter().append("g")
+      .enter().append("g")
       .attr("class", "legend")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
@@ -136,14 +250,21 @@ function changeDist_with()
 {
   d3.select("#slid").on("mousedown",function(){
   var slider = document.getElementById("der"); 
+  var dropdown = document.getElementById("Task2");
+  var Value = dropdown.options[dropdown.selectedIndex].value;
   //var bin = document.getElementById("demo"); 
   //bin.innerHTML=slider.value;
   slider.oninput = function() { 
     
     //bin.innerHTML = (parseInt(this.value)); 
     var dist=parseFloat(slider.value);
-    console.log(typeof dist)
-    send_data_with("/sendwith/"+(1.75-dist));
+    //console.log(typeof dist)
+    if(dist == 1.75)
+      val = 0.5
+    else 
+      val = parseFloat(1.75-dist)
+
+    getDistType_with(Value,val);
 } 
 })
 }
@@ -157,8 +278,8 @@ function draw_scattplot_without(dataset)
     data = dataset["datapoints"]
     console.log(data)
 
-    var margin = {top: 50, right: 10, bottom: 90, left: 300};
-    width = 1100 - margin.left - margin.right;
+    var margin = {top: 50, right: 10, bottom: 90, left: 100};
+    width = 1300 - margin.left - margin.right;
     height = 700 - margin.top - margin.bottom;
 
     var xValue = function(d) {return d.A;}, // data -> value
@@ -175,24 +296,24 @@ function draw_scattplot_without(dataset)
 // setup fill color
     //xScale.domain([d3.min(data, xValue)-1.5, d3.max(data, xValue)+1.5]);
     //yScale.domain([d3.min(data, yValue)-1.5, d3.max(data, yValue)+1.5]);
-    xScale.domain([-10,30]);
-    yScale.domain([-15,60]);
+    xScale.domain([-30,30]);
+    yScale.domain([-30,50]);
 
     var cValue = function(d) { return d.D;},
     color = d3.scale.category10();
 // add the graph canvas to the body of the webpage
     var svg = d3.select("body").append("svg").attr('class','svgid')
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   // x-axis
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
-    .append("text")
+      .append("text")
       .attr("class", "label")
       .attr("x", width)
       .attr("y", -6)
@@ -203,7 +324,7 @@ function draw_scattplot_without(dataset)
   svg.append("g")
       .attr("class", "y axis")
       .call(yAxis)
-    .append("text")
+      .append("text")
       .attr("class", "label")
       .attr("transform", "rotate(-90)")
       .attr("y", 6)
@@ -225,7 +346,7 @@ function draw_scattplot_without(dataset)
   // draw legend
   var legend = svg.selectAll(".legend")
       .data(color.domain())
-    .enter().append("g")
+      .enter().append("g")
       .attr("class", "legend")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
@@ -252,14 +373,21 @@ function changeDist_without()
 {
   d3.select("#slid").on("mousedown",function(){
   var slider = document.getElementById("der"); 
+  var dropdown = document.getElementById("Task2");
+  var Value = dropdown.options[dropdown.selectedIndex].value;
   //var bin = document.getElementById("demo"); 
   //bin.innerHTML=slider.value;
   slider.oninput = function() { 
     
     //bin.innerHTML = (parseInt(this.value)); 
     var dist=parseFloat(slider.value);
-    console.log(typeof dist)
-    send_data_without("/sendwithout/"+(1.75-dist));
+    //console.log(typeof dist)
+    if(dist == 1.75)
+      val = 0.5
+    else 
+      val = parseFloat(1.75-dist)
+
+    getDistType_without(Value,val);
 } 
 })
 }

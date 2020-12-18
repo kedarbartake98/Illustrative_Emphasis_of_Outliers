@@ -18,17 +18,26 @@
 	<h1 align="center">CSE 524 - Illustrative Emphasis of Outliers</h1>
 
 <div class="radio_container1">
-                <form id="samplingType" action=""  onchange="send()">
+                <form id="samplingType" action=""  onchange="setVal()">
                     <input class="radio" id="random" type="radio" name="sampling" value="random_sampling" >
                     <label class="radio_text" for="random">With Movement of Inliers</label>
                     <input class="radio" id="strat" type="radio" name="sampling" value="stratified_sampling" checked="checked">
                     <label class="radio_text" for="strat">Without Movement of Inliers</label>
                 </form>
             </div>
+<div class="dropdown_cont1" style="float: left">
 
+                <select class="dropdown1" id="Task2"  onchange="selectType()">
+                    <option value="-1" selected="selected">Select Dataset</option>
+                    <option value="housing">AMES Housing Dataset (SalePrice vs LotFrontage)</option>
+                    <option value="air">UCI Air Quality (T vs C6H6GT)</option>
+                    <option value="estate">Real Estate Data (INDUS vs DIS)</option>
+                    <option value="cereal">Cereal Nutrition (Calories vs Sodium)</option>
+                    <option value="fire">Forest Fires (RH vs DC)</option>
+                </select>
   <div id="chart_container"></div>
   </center>
-<div class="slider" id="slid">
+<div class="slider" id="slid" style="float: right">
   <input type="range" min="0.0" max="1.75" value="0" step="0.25" class="sli" id="der" onchange="updateTextInput(this.value);">
 	<input type="text" id="textInput" value="">
 </div>
