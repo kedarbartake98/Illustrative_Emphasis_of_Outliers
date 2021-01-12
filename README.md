@@ -15,6 +15,7 @@ To transform the scatterplot, we first cluster the data, and then calculate the 
   1. We calculate a vector for each point using factors like LOF score, KDE density, distance from nearest density peaks, etc.  
   2. We then move the point along the vector to produce a transformation.  
     
+    
   - *Using Local Gradients* (TODO):  
   1. We compute a grid of points over the entire scatterplot and sample the KDE density over that grid. 
   2. For each point, sample the gradient of the density around that point and move the point in that direction to produce a transformation.  
